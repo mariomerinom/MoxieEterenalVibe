@@ -1,0 +1,114 @@
+/* MEV Dashboard — Dark Terminal Theme */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #0d1117;
+    color: #c9d1d9;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', monospace;
+    margin: 0;
+    padding: 0;
+}
+
+/* Tabs */
+.tab {
+    background-color: #161b22 !important;
+    color: #8b949e !important;
+    border: none !important;
+    border-bottom: 2px solid transparent !important;
+    padding: 12px 24px !important;
+    font-family: inherit !important;
+    font-size: 13px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tab:hover {
+    color: #c9d1d9 !important;
+    background-color: #1c2128 !important;
+}
+
+.tab--selected {
+    background-color: #0d1117 !important;
+    color: #58a6ff !important;
+    border-bottom: 2px solid #58a6ff !important;
+}
+
+/* Tables */
+table {
+    font-size: 13px;
+}
+
+th {
+    text-align: left;
+    padding: 8px 12px;
+    color: #8b949e;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 11px;
+}
+
+td {
+    padding: 8px 12px;
+}
+
+/* Links */
+a {
+    color: #58a6ff;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Cards hover effect */
+.card:hover {
+    border-color: #58a6ff;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0d1117;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #30363d;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #484f58;
+}
+
+/* Plotly chart adjustments */
+.js-plotly-plot .plotly .modebar {
+    background: transparent !important;
+}
+
+.js-plotly-plot .plotly .modebar-btn path {
+    fill: #8b949e !important;
+}
+
+/* DataTable overrides */
+.dash-table-container .dash-spreadsheet-container .dash-spreadsheet-inner th {
+    background-color: #161b22 !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .tab {
+        padding: 8px 12px !important;
+        font-size: 11px !important;
+    }
+}

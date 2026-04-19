@@ -1,0 +1,62 @@
+# Strategy parameter ranges for autoresearch loop.
+# Strategies are activated only after Phase 2 scoring validates them.
+
+[[strategies]]
+name = "backrun"
+enabled = false  # activated when Phase 2 scores L1 backrunning as viable
+
+[strategies.params.min_profit_eth]
+min = 0.0001
+max = 0.05
+step = 0.001
+current = 0.001
+
+[strategies.params.max_gas_fraction]
+min = 0.5
+max = 0.95
+step = 0.05
+current = 0.80
+
+[strategies.params.bribe_pct]
+min = 0.3
+max = 0.8
+step = 0.05
+current = 0.50
+
+[[strategies]]
+name = "dex_arb"
+enabled = false  # activated per chain when Phase 2 identifies viable arb markets
+
+[strategies.params.min_profit_eth]
+min = 0.001
+max = 0.1
+step = 0.005
+current = 0.005
+
+[strategies.params.max_gas_gwei]
+min = 10.0
+max = 100.0
+step = 5.0
+current = 50.0
+
+[strategies.params.bribe_pct]
+min = 0.5
+max = 0.9
+step = 0.05
+current = 0.70
+
+[[strategies]]
+name = "liquidation"
+enabled = false  # activated only if Phase 2 finds a chain with thin liquidation competition
+
+[strategies.params.min_profit_eth]
+min = 0.005
+max = 0.1
+step = 0.005
+current = 0.01
+
+[strategies.params.hf_liquidate_threshold]
+min = 0.95
+max = 1.02
+step = 0.01
+current = 1.0

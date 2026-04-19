@@ -1,0 +1,173 @@
+# Multi-chain capture configuration.
+# RPC URLs should reference env vars — actual keys in .env
+
+[storage]
+data_dir = "./data"
+duckdb_path = "./data/mev.duckdb"
+flush_interval_secs = 30
+buffer_size = 100
+
+[mevshare]
+enabled = true
+sse_url = "https://mev-share.flashbots.net"
+
+[ground_truth]
+eigenphi_enabled = true
+eigenphi_api_key = "${EIGENPHI_API_KEY}"
+zeromev_enabled = true
+
+# --- Chains ---
+
+[chains.ethereum]
+enabled = true
+rpc_http = "${ETH_RPC_HTTP}"
+rpc_ws = "${ETH_RPC_WS}"
+chain_id = 1
+block_time_ms = 12000
+requests_per_second = 25
+
+[[chains.ethereum.dex_protocols]]
+name = "uniswap_v2"
+factory = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
+router = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
+
+[[chains.ethereum.dex_protocols]]
+name = "uniswap_v3"
+factory = "0x1F98431c8aD98523631AE4a59f267346ea31F984"
+router = "0xE592427A0AEce92De3Edee1F18E0157C05861564"
+
+[[chains.ethereum.dex_protocols]]
+name = "sushiswap"
+factory = "0xC0AEe478e3658e2610c5F7A4A2E1777cE9e4f2Ac"
+
+[[chains.ethereum.lending_protocols]]
+name = "aave_v3"
+pool = "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2"
+
+[[chains.ethereum.lending_protocols]]
+name = "compound_v3"
+pool = "0xc3d688B66703497DAA19211EEdff47f25384cdc3"
+
+[chains.base]
+enabled = true
+rpc_http = "${BASE_RPC_HTTP}"
+rpc_ws = "${BASE_RPC_WS}"
+chain_id = 8453
+block_time_ms = 2000
+requests_per_second = 25
+
+[[chains.base.dex_protocols]]
+name = "aerodrome"
+factory = "0x420DD381b31aEf6683db6B902084cB0FFECe40Da"
+router = "0xcF77a3Ba9A5CA399B7c97c74d54e5b1Beb874E43"
+
+[[chains.base.dex_protocols]]
+name = "uniswap_v3"
+factory = "0x33128a8fC17869897dcE68Ed026d694621f6FDfD"
+
+[[chains.base.lending_protocols]]
+name = "aave_v3"
+pool = "0xA238Dd80C259a72e81d7e4664a9801593F98d1c5"
+
+[[chains.base.lending_protocols]]
+name = "seamless"
+pool = "0x8F44Fd754285aa6A2b8B9B97739B79746e0475a7"
+
+[[chains.base.lending_protocols]]
+name = "moonwell"
+pool = "0xfBb21d0380beE3312B33c4353c8936a0F13EF26C"
+
+[chains.arbitrum]
+enabled = true
+rpc_http = "${ARB_RPC_HTTP}"
+rpc_ws = "${ARB_RPC_WS}"
+chain_id = 42161
+block_time_ms = 250
+requests_per_second = 25
+
+[[chains.arbitrum.dex_protocols]]
+name = "uniswap_v3"
+factory = "0x1F98431c8aD98523631AE4a59f267346ea31F984"
+
+[[chains.arbitrum.dex_protocols]]
+name = "camelot"
+factory = "0x6EcCab422D763aC031210895C81787E87B43A652"
+
+[[chains.arbitrum.lending_protocols]]
+name = "aave_v3"
+pool = "0x794a61358D6845594F94dc1DB02A252b5b4814aD"
+
+[[chains.arbitrum.lending_protocols]]
+name = "radiant"
+pool = "0xF4B1486DD74D07706052A33d31d7c0AAFD0659E1"
+
+[chains.polygon]
+enabled = true
+rpc_http = "${POLYGON_RPC_HTTP}"
+rpc_ws = "${POLYGON_RPC_WS}"
+chain_id = 137
+block_time_ms = 2000
+requests_per_second = 25
+
+[[chains.polygon.dex_protocols]]
+name = "uniswap_v3"
+factory = "0x1F98431c8aD98523631AE4a59f267346ea31F984"
+
+[[chains.polygon.dex_protocols]]
+name = "quickswap"
+factory = "0x5757371414417b8C6CAad45bAeF941aBc7d3Ab32"
+
+[[chains.polygon.lending_protocols]]
+name = "aave_v3"
+pool = "0x794a61358D6845594F94dc1DB02A252b5b4814aD"
+
+[chains.scroll]
+enabled = true
+rpc_http = "${SCROLL_RPC_HTTP}"
+rpc_ws = "${SCROLL_RPC_WS}"
+chain_id = 534352
+block_time_ms = 3000
+requests_per_second = 15
+
+[[chains.scroll.dex_protocols]]
+name = "syncswap"
+factory = "0x37BAc764494c8db4e54BDE72f6965beA9fa0AC2d"
+
+[[chains.scroll.lending_protocols]]
+name = "aave_v3"
+pool = "0x11fCfe756c05AD438e312a7fd934381537D3cFfe"
+
+[chains.blast]
+enabled = true
+rpc_http = "${BLAST_RPC_HTTP}"
+rpc_ws = "${BLAST_RPC_WS}"
+chain_id = 81457
+block_time_ms = 2000
+requests_per_second = 15
+
+[[chains.blast.dex_protocols]]
+name = "thruster"
+factory = "0xb4A7D971D0ADea1c73198C97d7ab3f9CE4aaFA13"
+
+[[chains.blast.lending_protocols]]
+name = "orbit"
+pool = "0x1E18C3cb491D908241D0db14b5B2e23A51b72a6B"
+
+[chains.solana]
+enabled = true
+rpc_http = "${SOLANA_RPC_HTTP}"
+chain_id = 0
+block_time_ms = 400
+requests_per_second = 40
+
+[[chains.solana.dex_protocols]]
+name = "raydium_amm"
+router = "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8"
+
+[[chains.solana.dex_protocols]]
+name = "orca_whirlpool"
+router = "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc"
+
+[[chains.solana.dex_protocols]]
+name = "jupiter_v6"
+router = "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"

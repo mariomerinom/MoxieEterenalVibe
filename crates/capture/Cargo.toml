@@ -1,0 +1,35 @@
+[package]
+name = "mev-capture"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+
+[[bin]]
+name = "mev-ingest"
+path = "src/bin/ingest.rs"
+
+[dependencies]
+alloy.workspace = true
+alloy-primitives.workspace = true
+alloy-rpc-types.workspace = true
+alloy-provider.workspace = true
+alloy-transport-ws.workspace = true
+alloy-sol-types.workspace = true
+tokio.workspace = true
+futures.workspace = true
+async-trait.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+reqwest.workspace = true
+eventsource-client.workspace = true
+arrow.workspace = true
+parquet.workspace = true
+tracing.workspace = true
+eyre.workspace = true
+thiserror.workspace = true
+chrono.workspace = true
+toml.workspace = true
+dotenvy.workspace = true
+hex-literal.workspace = true
+duckdb.workspace = true
+tracing-subscriber.workspace = true

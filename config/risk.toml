@@ -1,0 +1,28 @@
+# Risk controls applied across all phases.
+
+[limits]
+max_bundle_value_eth = 0.05
+daily_loss_limit_eth = 0.5
+gas_bid_ceiling_pct = 0.80
+max_revert_rate_pct = 0.30
+simulation_divergence_threshold = 0.60
+
+[capture_health]
+max_blocks_behind = 100
+alert_on_gap = true
+auto_backfill = true
+
+[phase_gates]
+# Phase 2 -> Phase 3 gate thresholds
+min_monthly_profit_eth = 5.0          # ~$20K at $4K/ETH
+max_herfindahl = 0.30
+min_detection_rate = 0.70
+min_pnl_accuracy = 0.70
+min_dry_run_days = 14
+min_dry_run_inclusion_rate = 0.30
+
+[scaling]
+# Post Phase 3.3 scaling criteria
+min_executions_before_scale = 100
+max_loss_per_tx_eth = 0.05
+performance_match_threshold = 0.70   # actual must be >=70% of dry-run

@@ -1,0 +1,19 @@
+[package]
+name = "mev-strategies"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+
+[dependencies]
+mev-capture.workspace = true
+mev-simulator.workspace = true
+mev-executor.workspace = true
+alloy.workspace = true
+alloy-primitives.workspace = true
+alloy-sol-types.workspace = true
+async-trait.workspace = true
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tracing.workspace = true
+eyre.workspace = true

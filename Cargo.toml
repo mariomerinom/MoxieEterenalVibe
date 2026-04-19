@@ -1,0 +1,70 @@
+[workspace]
+members = [
+    "crates/capture",
+    "crates/analysis",
+    "crates/simulator",
+    "crates/strategies",
+    "crates/executor",
+    "crates/bot",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["Mario Merino"]
+
+[workspace.dependencies]
+# Ethereum primitives & providers
+alloy = { version = "1", features = ["full"] }
+alloy-primitives = "1"
+alloy-sol-types = "1"
+alloy-provider = { version = "1", features = ["ws"] }
+alloy-rpc-types = "1"
+alloy-transport-ws = "1"
+
+# EVM simulation
+revm = { version = "36", features = ["std", "serde", "alloydb", "asyncdb"] }
+
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+futures = "0.3"
+async-trait = "0.1"
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+
+# HTTP + SSE
+reqwest = { version = "0.12", features = ["json"] }
+eventsource-client = "0.13"
+
+# Data storage
+arrow = { version = "53", features = ["prettyprint"] }
+parquet = { version = "53", features = ["async"] }
+duckdb = { version = "1", features = ["bundled"] }
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Error handling
+eyre = "0.6"
+thiserror = "2"
+
+# Data
+chrono = { version = "0.4", features = ["serde"] }
+
+# Utilities
+hex-literal = "0.4"
+
+# Environment
+dotenvy = "0.15"
+
+# Internal crates
+mev-capture = { path = "crates/capture" }
+mev-analysis = { path = "crates/analysis" }
+mev-simulator = { path = "crates/simulator" }
+mev-strategies = { path = "crates/strategies" }
+mev-executor = { path = "crates/executor" }

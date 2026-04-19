@@ -1,0 +1,30 @@
+[package]
+name = "mev-bot"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+
+[[bin]]
+name = "mev-bot"
+path = "src/main.rs"
+
+[dependencies]
+mev-capture.workspace = true
+mev-simulator.workspace = true
+mev-strategies.workspace = true
+mev-executor.workspace = true
+
+alloy.workspace = true
+alloy-primitives.workspace = true
+alloy-provider = { workspace = true, features = ["ws"] }
+alloy-transport-ws.workspace = true
+
+tokio.workspace = true
+futures.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+eyre.workspace = true
+chrono.workspace = true
+dotenvy.workspace = true
