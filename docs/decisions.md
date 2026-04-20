@@ -321,9 +321,44 @@ At 100bps net margin (optimistic): $213/day. Top-3 liquidators control 100% of v
 
 ---
 
+### 2026-04-20 — Final kill: Solana cross-DEX arb (B3 live pool-state probe)
+
+**Decision:** Solana cross-DEX direct arb is confirmed killed. The market is efficient on pairs that can be arbed; un-arbable pairs lack cross-DEX direct routes entirely.
+
+**Evidence (B3, 1.34h live probe via Jupiter quote API, 3,880 ticks across 8 pairs):**
+
+1. **Methodology:** Polled Jupiter's `/quote` endpoint every 10s with DEX filters (`dexes=Raydium`, `dexes=Whirlpool`, `dexes=Meteora DLMM`) and `onlyDirectRoutes=true`. Returns LIVE per-DEX output amounts reflecting on-chain pool state. Chose Jupiter over Raydium/Orca public APIs because the latter serve stale cached prices (Orca reported SOL/USDC at $127 when on-chain reality was $86, a 48% error).
+
+2. **Multi-DEX coverage breakdown:**
+   - SOL/USDC: 3 DEXs consistent coverage, 56% of 485 ticks had 2+ DEXs active
+   - SOL/USDT: 3 DEXs, 67% coverage
+   - USDC/USDT: 3 DEXs, 3% coverage
+   - mSOL/SOL, jitoSOL/SOL, BONK/SOL, WIF/SOL, USDC→SOL (reverse): **zero** cross-DEX direct coverage → structurally un-arbable via single-hop routes
+
+3. **Divergence distribution (612 multi-DEX observations):**
+   - SOL/USDC: min 0.00% / median 0.15% / max 0.47%
+   - SOL/USDT: min 0.01% / median 0.19% / max 0.46%
+   - USDC/USDT: min 0.01% / median 0.57% / max 0.57% (pinned at fee boundary)
+   - **ZERO observations above the 0.6% round-trip fee threshold**
+   - **ZERO divergence events logged for follow-up analysis**
+
+4. **Key finding:** The B1 "preliminary" kill was vindicated by methodologically superior B3 data. The backfill bias we flagged in B1 (only seeing divergence when both pools had a swap in the same window) did NOT mask hidden opportunities — the market really is this efficient.
+
+5. **USDC/USDT at 0.57% is structural, not arb:** The divergence is pinned at nearly exactly the fee boundary and doesn't oscillate. This is two stablecoin pools priced at slightly different intercepts relative to their internal liquidity curves — arb activity has already compressed the spread to the point where one more hop costs more than the spread yields.
+
+**Extrapolation:** 22 additional hours at current observed rate (0/hour) = 0 additional events. Even assuming 5 rare memecoin-pump events we'd miss in the sample, daily total = 5, far below the 50/day "go" threshold.
+
+**Reopen if:**
+- New major DEX launches on Solana with significant isolated liquidity
+- A specific pair develops recurring transient divergence (would require event-driven monitoring, not polling)
+- Multi-hop routing (arb via intermediate tokens) is evaluated — we only tested direct single-hop routes
+- Private-mempool access via Jito bundle sniffing opens (different strategy entirely — requires joining Jito searcher network)
+
+---
+
 ### 2026-04-19 — Preliminary: Solana cross-DEX arb sizing (B1)
 
-**Decision:** Solana cross-DEX arb from historical swap data shows $190/day at 100% capture. Does not pass $500/day target at realistic capture rates. However, methodology has known limitations — proceed to B3 (live pool state probe) before final kill.
+**Decision:** Solana cross-DEX arb from historical swap data shows $190/day at 100% capture. Does not pass $500/day target at realistic capture rates. However, methodology has known limitations — proceed to B3 (live pool state probe) before final kill. (Updated 2026-04-20: B3 confirmed the kill.)
 
 **Evidence (B1, 7-day backfill, 2M swaps from 2,000 Parquet files):**
 
