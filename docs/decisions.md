@@ -321,6 +321,35 @@ At 100bps net margin (optimistic): $213/day. Top-3 liquidators control 100% of v
 
 ---
 
+### 2026-04-20 — Honest strategy-space audit
+
+**Decision:** "One remaining viable path" is accurate for strategies we have specifically tested, but it oversimplifies the landscape. There are strategy categories that have not been evaluated and should not be assumed killed by association. Recording them explicitly so we don't develop false certainty about what's left.
+
+**Strategies with empirical kills (12):** Ethereum V2-V2, Camelot, Aerodrome, MEV-Share backrun, public-mempool sandwich, Aave+Compound liquidations, Arbitrum expanded arb, CEX-DEX niche tokens, cross-chain L2-L2, Solidly math fix, Ethereum V2-V3 expanded, Solana direct cross-DEX arb. All documented with evidence above.
+
+**In-flight (1):** Ethereum private-mempool sandwich via self-hosted Geth node. Blocked on OVH storage upgrade.
+
+**Adjacent / untested categories:**
+
+1. **JIT (just-in-time) liquidity.** Provide a V3 LP position right before a large swap seen in the mempool, earn the swap fee, remove the position. Uses the same Geth mempool infrastructure as sandwich, so it is effectively free to evaluate in parallel once the node is up. Different profit mechanic (fee capture, not slippage capture).
+
+2. **Solana perpetuals liquidations.** Our liquidation sizing covered only Aave V3 + Compound V3 on EVM chains. Solana perp DEXes (Drift, Zeta, Mango) run their own liquidation markets not surveyed. Would require a separate data pipeline.
+
+3. **Solana multi-hop cross-DEX arb.** B3 tested only direct single-hop routes (`onlyDirectRoutes=true`). A → B → C paths through intermediate tokens could surface opportunities that direct routes mask.
+
+4. **Oracle MEV.** Chainlink / Pyth price-update transactions can be sandwiched against oracle-dependent protocols (lending collateral updates, perp mark prices). Narrow market, never evaluated.
+
+5. **Builder partnerships / private order flow.** Not a technical strategy — a business development path. Applying to be a CoWSwap/UniswapX solver, or negotiating direct order flow from a builder, materially changes the economics of any execution strategy by removing the competition/visibility problem.
+
+**Things NOT worth re-evaluating** (killed by structural association with failed tests):
+- Sub-chain L2 MEV (Blast, Scroll, Polygon) — same structure as killed Ethereum/Arbitrum with less liquidity
+- NFT MEV — tiny market by any measure
+- Additional cross-chain bridge pairs — killed by L2-L2 analysis
+
+**Policy note:** When any of items 1-5 gets evaluated, it gets its own decision entry here with evidence. "Reopened" is not a conclusion; only "killed" or "go" are.
+
+---
+
 ### 2026-04-20 — Final kill: Solana cross-DEX arb (B3 live pool-state probe)
 
 **Decision:** Solana cross-DEX direct arb is confirmed killed. The market is efficient on pairs that can be arbed; un-arbable pairs lack cross-DEX direct routes entirely.
