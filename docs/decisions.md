@@ -321,6 +321,34 @@ At 100bps net margin (optimistic): $213/day. Top-3 liquidators control 100% of v
 
 ---
 
+### 2026-05-01 — Partial probe: Solana perp liquidations (Drift)
+
+**Decision:** Pause; Solana perp liquidations remain untested. Initial probe attempt did not produce conclusive data within reasonable time budget. Marked for resumption when execution stack is otherwise idle.
+
+**Evidence (limited):**
+- Drift program (`dRiftyHA39MWEi3m9aunc5MzRF1JYuBsbn6VPcn33UH`) on mainnet has ~225 direct signatures/hour, **97% of which are errored transactions**. The error pattern (Custom error 101) is consistent with bots racing for the same opportunity (auction/match races).
+- 30-minute sample of 104 direct-call signatures: zero liquidation instructions detected matching Anchor discriminators (`liquidate_perp`, `liquidate_spot`, `liquidate_borrow_for_perp_pnl`, `liquidate_perp_pnl_for_deposit`, `liquidate_perp_with_fill`, `resolve_perp_bankruptcy`, `resolve_spot_bankruptcy`).
+- Most Drift core calls arrive via CPI from vault/aggregator programs (e.g., `vVoLTRjQmt...`). Probe checks inner instructions, but the inner Drift discriminators observed in samples (e.g., `27a68bf39ea59be1`) do not match any liquidation entry.
+- Drift's S3 historical data bucket (`drift-historical-data-v2`) contains trade records and funding records but no separate liquidator track. Most files date from 2024-Q1 2025; recent months (May 2026) absent.
+
+**Methodology gaps:**
+- Did not verify Anchor discriminator computation against Drift's current published IDL (instructions might have been renamed in a recent program upgrade).
+- Did not enumerate other Solana perp DEXes (Mango v4, Zeta) — Drift was tested as the dominant one.
+- Public RPC heavily rate-limited; switched to Alchemy mid-probe but did not extend sample window.
+- Did not test liquidation frequency via direct on-chain event log subscription (`LiquidationRecord` event in Drift's IDL).
+
+**Files:** `scripts/research/drift_liquidation_sizing.py`
+
+**Reopen if/when:**
+- Other tracks (Ethereum sandwich) confirm-kill and we need to revisit the strategy space
+- A public dashboard or third-party indexer surfaces aggregate Solana perp liquidation stats first (cheaper signal than parsing on-chain ourselves)
+- Drift IDL inspection confirms the current discriminator names match what we computed
+
+**Ballpark sanity check before resuming:**
+Drift daily volume is ~$200M historical. If liquidations are 0.5-1% of volume → $1-2M/day liquidator-addressable, top-3 capture ~70%, bonus rate ~5%. Theoretical 1% capture = ~$500-1000/day if we win that 1%. The opportunity is plausibly in the right size range; the question is competition and access — both unanswered.
+
+---
+
 ### 2026-04-20 — Honest strategy-space audit
 
 **Decision:** "One remaining viable path" is accurate for strategies we have specifically tested, but it oversimplifies the landscape. There are strategy categories that have not been evaluated and should not be assumed killed by association. Recording them explicitly so we don't develop false certainty about what's left.
