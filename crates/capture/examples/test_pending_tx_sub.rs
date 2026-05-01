@@ -10,6 +10,7 @@
 
 use std::time::{Duration, Instant};
 
+use alloy::consensus::Transaction as TxTrait;
 use eyre::Result;
 use mev_capture::chain::ethereum::EthereumFetcher;
 
@@ -41,13 +42,12 @@ async fn main() -> Result<()> {
                 first_seen.get_or_insert_with(Instant::now);
                 if count <= 3 {
                     println!(
-                        "  tx #{}: hash={:?} from={:?} to={:?} value={:?} input_len={}",
+                        "  tx #{}: hash={:?} to={:?} value={} input_len={}",
                         count,
-                        tx.inner.tx_hash(),
-                        tx.from,
-                        tx.to(),
-                        tx.value(),
-                        tx.input().len(),
+                        tx.inner.hash(),
+                        tx.inner.to(),
+                        tx.inner.value(),
+                        tx.inner.input().len(),
                     );
                 }
             }
