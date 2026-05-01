@@ -212,7 +212,8 @@ impl EvmFetcher {
     /// Subscribe to new block numbers via WebSocket.
     ///
     /// Returns a receiver yielding block numbers as they're produced.
-    /// The internal task runs until the WS connection drops or the receiver is dropped.
+    /// The internal task owns the WS provider so it stays connected
+    /// for as long as the receiver is held.
     pub async fn subscribe_new_blocks(&self) -> Result<mpsc::Receiver<u64>> {
         let ws_url = self
             ._rpc_ws
@@ -235,6 +236,8 @@ impl EvmFetcher {
         let chain = self.chain;
 
         tokio::spawn(async move {
+            // Hold provider alive: dropping it would close the WS transport.
+            let _provider_guard = provider;
             let mut stream = sub.into_stream();
             while let Some(header) = stream.next().await {
                 let n = header.number;
@@ -283,6 +286,8 @@ impl EvmFetcher {
         let chain = self.chain;
 
         tokio::spawn(async move {
+            // Hold provider alive: dropping it would close the WS transport.
+            let _provider_guard = provider;
             let mut stream = sub.into_stream();
             let mut count = 0u64;
             let mut last_log = std::time::Instant::now();
