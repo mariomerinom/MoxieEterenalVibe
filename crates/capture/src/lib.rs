@@ -1,6 +1,7 @@
 pub mod chain;
 pub mod checkpoint;
 pub mod config;
+pub mod decoders;
 pub mod events;
 pub mod ground_truth;
 pub mod mevshare;
