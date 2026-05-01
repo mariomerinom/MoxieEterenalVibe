@@ -8,13 +8,14 @@ use std::time::Duration;
 
 use alloy::consensus::Transaction as TxTrait;
 use alloy::network::{AnyNetwork, ReceiptResponse, TransactionResponse};
-use alloy::providers::{Provider, RootProvider};
+use alloy::providers::{Provider, ProviderBuilder, RootProvider, WsConnect};
 use alloy_primitives::{B256, U256};
 use alloy_rpc_types::{BlockId, BlockNumberOrTag};
 use chrono::{DateTime, Utc};
 use eyre::{Result, WrapErr};
 use futures::{stream, StreamExt};
 use tokio::sync::Semaphore;
+use tokio::sync::mpsc;
 
 use crate::types::{BlockData, Chain, LogData, TransactionData};
 
@@ -206,5 +207,106 @@ impl EvmFetcher {
 
     pub async fn latest_block(&self) -> Result<u64> {
         Ok(self.provider.get_block_number().await?)
+    }
+
+    /// Subscribe to new block numbers via WebSocket.
+    ///
+    /// Returns a receiver yielding block numbers as they're produced.
+    /// The internal task runs until the WS connection drops or the receiver is dropped.
+    pub async fn subscribe_new_blocks(&self) -> Result<mpsc::Receiver<u64>> {
+        let ws_url = self
+            ._rpc_ws
+            .clone()
+            .ok_or_else(|| eyre::eyre!("[{}] WS URL not configured", self.chain.as_str()))?;
+
+        let ws = WsConnect::new(ws_url);
+        let provider = ProviderBuilder::new()
+            .network::<AnyNetwork>()
+            .connect_ws(ws)
+            .await
+            .wrap_err("failed to connect WS provider")?;
+
+        let sub = provider
+            .subscribe_blocks()
+            .await
+            .wrap_err("subscribe_blocks failed")?;
+
+        let (tx, rx) = mpsc::channel::<u64>(256);
+        let chain = self.chain;
+
+        tokio::spawn(async move {
+            let mut stream = sub.into_stream();
+            while let Some(header) = stream.next().await {
+                let n = header.number;
+                if tx.send(n).await.is_err() {
+                    tracing::debug!(chain = %chain.as_str(), "block subscriber dropped, exiting");
+                    break;
+                }
+            }
+            tracing::warn!(chain = %chain.as_str(), "WS block stream ended");
+        });
+
+        Ok(rx)
+    }
+
+    /// Subscribe to pending (mempool) transactions in **full** form.
+    ///
+    /// Each item is a full transaction object (hash, from, to, value, input,
+    /// gas, gas price, nonce, etc.). This is the input to sandwich/JIT/oracle
+    /// MEV strategies.
+    ///
+    /// Performance: pending tx volume on Ethereum mainnet is ~10/s (public mempool
+    /// only — much higher with private order flow access). The 8192-deep channel
+    /// gives ~13min of buffering before back-pressuring.
+    ///
+    /// Returns receiver yielding alloy `Transaction` (full RPC representation).
+    pub async fn subscribe_pending_transactions(
+        &self,
+    ) -> Result<mpsc::Receiver<alloy_rpc_types::Transaction>> {
+        let ws_url = self
+            ._rpc_ws
+            .clone()
+            .ok_or_else(|| eyre::eyre!("[{}] WS URL not configured", self.chain.as_str()))?;
+
+        let ws = WsConnect::new(ws_url);
+        let provider = ProviderBuilder::new()
+            .connect_ws(ws)
+            .await
+            .wrap_err("failed to connect WS provider")?;
+
+        let sub = provider
+            .subscribe_full_pending_transactions()
+            .await
+            .wrap_err("subscribe_full_pending_transactions failed")?;
+
+        let (tx, rx) = mpsc::channel::<alloy_rpc_types::Transaction>(8192);
+        let chain = self.chain;
+
+        tokio::spawn(async move {
+            let mut stream = sub.into_stream();
+            let mut count = 0u64;
+            let mut last_log = std::time::Instant::now();
+            while let Some(pending_tx) = stream.next().await {
+                count += 1;
+                if last_log.elapsed() > Duration::from_secs(60) {
+                    let rate = count as f64 / last_log.elapsed().as_secs_f64();
+                    tracing::info!(
+                        chain = %chain.as_str(),
+                        count,
+                        rate_per_sec = rate,
+                        "pending tx stream"
+                    );
+                    last_log = std::time::Instant::now();
+                    count = 0;
+                }
+                if tx.send(pending_tx).await.is_err() {
+                    tracing::debug!(chain = %chain.as_str(), "pending-tx subscriber dropped");
+                    break;
+                }
+            }
+            tracing::warn!(chain = %chain.as_str(), "WS pending-tx stream ended");
+        });
+
+        Ok(rx)
     }
 }

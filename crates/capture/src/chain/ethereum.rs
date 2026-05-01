@@ -39,6 +39,20 @@ impl ChainFetcher for EthereumFetcher {
     }
 
     async fn subscribe_new_blocks(&self) -> Result<tokio::sync::mpsc::Receiver<u64>> {
-        todo!("Phase 1.3: WebSocket block subscription")
+        self.inner.subscribe_new_blocks().await
+    }
+}
+
+impl EthereumFetcher {
+    /// Subscribe to pending (mempool) transactions — input feed for
+    /// sandwich/JIT/oracle MEV strategies.
+    ///
+    /// Requires a WebSocket endpoint that exposes `eth_subscribe(
+    /// "newPendingTransactions", true)`. Self-hosted Geth does this; many
+    /// public RPCs strip pending-tx subscriptions.
+    pub async fn subscribe_pending_transactions(
+        &self,
+    ) -> Result<tokio::sync::mpsc::Receiver<alloy_rpc_types::Transaction>> {
+        self.inner.subscribe_pending_transactions().await
     }
 }
